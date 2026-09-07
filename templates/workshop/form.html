@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+
+{% block title %}Atölye Kaydı Oluştur | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+    <div class="card border-0 shadow-sm p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="fw-bold m-0">
+                <i class="fa-solid fa-industry text-primary me-2"></i>Atölye Bilgilerini Girin
+            </h3>
+            <a href="{% url 'workshop:list' %}" class="btn btn-outline-secondary btn-sm">İptal</a>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+            {% csrf_token %}
+
+            <!-- Atölye Adı -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Atölye Adı / Unvanı</label>
+                {{ form.name }}
+            </div>
+
+            <!-- Kategori ve İletişim -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Kategori</label>
+                    {{ form.category }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Telefon Numarası</label>
+                    {{ form.phone }}
+                </div>
+            </div>
+
+            <!-- E-posta ve Personel Sayısı -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">E-posta Adresi</label>
+                    {{ form.email }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Çalışan Sayısı</label>
+                    {{ form.employee_count }}
+                </div>
+            </div>
+
+            <!-- Günlük Kapasite -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Günlük Üretim Kapasitesi (Adet)</label>
+                {{ form.daily_capacity }}
+            </div>
+
+            <!-- Konum Bilgileri -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Şehir</label>
+                    {{ form.city }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">İlçe</label>
+                    {{ form.district }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Açık Adres</label>
+                {{ form.address }}
+            </div>
+
+            <!-- Açıklama -->
+            <div class="mb-3">
+                <label class="form-label fw-bold">Atölye Açıklaması / Uzmanlık Alanları</label>
+                {{ form.description }}
+            </div>
+
+            <!-- Görseller (Logo ve Kapak) -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Atölye Logosu</label>
+                    {{ form.logo }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label fw-bold">Kapak Görseli</label>
+                    {{ form.cover_image }}
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100 py-2 fw-bold mt-3">
+                <i class="fa-solid fa-check me-2"></i> Atölyeyi Kaydet ve Yayınla
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

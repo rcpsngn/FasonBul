@@ -1,0 +1,46 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+    <div class="container">
+        <a class="navbar-brand fs-4 text-primary fw-bold" href="/">Fason<span class="text-white">Bul</span></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.app_name == 'workshop' %}active{% endif %}" href="{% url 'workshop:list' %}">Atölyeler</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto align-items-lg-center">
+                {% if user.is_authenticated %}
+                    <li class="nav-item me-2 mb-2 mb-lg-0">
+                        <a href="{% url 'workshop:create' %}" class="btn btn-outline-light btn-sm">+ Atölye Ekle</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                            {% endif %}
+                            <span>{{ user.first_name|default:user.username }}</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profilim ve Ayarlar</a></li>
+                            {% if user.is_staff %}
+                                <li><a class="dropdown-item text-warning" href="/admin/" target="_blank">Yönetici Paneli</a></li>
+                            {% endif %}
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">Çıkış Yap</a></li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item me-2">
+                        <a class="nav-link" href="{% url 'accounts:login' %}">Giriş Yap</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-primary btn-sm px-3" href="{% url 'accounts:register' %}">Kayıt Ol</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+</nav>

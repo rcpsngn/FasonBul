@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}Giriş Yap | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card border-0 shadow-sm p-4">
+                <h3 class="fw-bold text-center mb-4">Giriş Yap</h3>
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Kullanıcı Adı</label>
+                        <input type="text" name="username" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Şifre</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-2">Giriş Yap</button>
+                </form>
+                <hr class="my-4">
+                <p class="text-center mb-0">Hesabınız yok mu? <a href="{% url 'accounts:register' %}" class="fw-semibold">Kayıt Olun</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block title %}Atölye Arama ve Filtreleme | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold mb-4 text-dark">Atölye ve İmalathane Ara</h2>
+
+    <!-- FİLTRELEME KARTI -->
+    <div class="card shadow-sm p-4 mb-4 bg-white rounded-3 border-0">
+        <form method="GET" action="{% url 'workshop:list' %}" id="searchForm">
+            <input type="hidden" name="user_lat" id="userLat" value="{{ request.GET.user_lat }}">
+            <input type="hidden" name="user_lng" id="userLng" value="{{ request.GET.user_lng }}">
+
+            <div class="row g-3">
+                <!-- Şehir -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Şehir</label>
+                    <input type="text" name="city" class="form-control" placeholder="Örn: Bursa, İstanbul" value="{{ selected_city }}">
+                </div>
+
+                <!-- Kategori / Ne Yapıyor -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Uzmanlık / İşlem</label>
+                    <select name="category" class="form-select">
+                        <option value="">Tüm Kategoriler</option>
+                        {% for code, name in category_choices %}
+                            <option value="{{ code }}" {% if selected_category == code %}selected{% endif %}>{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- Mesafe Filtresi -->
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Mesafe Yarıçapı</label>
+                    <select name="distance" class="form-select">
+                        <option value="">Mesafe Sınırlaması Yok</option>
+                        <option value="10" {% if selected_distance == '10' %}selected{% endif %}>10 km Yakınımda</option>
+                        <option value="50" {% if selected_distance == '50' %}selected{% endif %}>50 km Yakınımda</option>
+                        <option value="100" {% if selected_distance == '100' %}selected{% endif %}>100 km Yakınımda</option>
+                        <option value="500" {% if selected_distance == '500' %}selected{% endif %}>500 km Yakınımda</option>
+                    </select>
+                </div>
+
+                <!-- Butonlar -->
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Ara</button>
+                    <button type="button" onclick="getLocation()" class="btn btn-outline-secondary text-nowrap" title="Konumunuzu Alın">
+                        📍 Konum Al
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- SONUÇLAR -->
+    <div class="row">
+        {% if workshops %}
+            <!-- VERİTABANINDAKİ KAYITLI ATÖLYELER -->
+            <div class="col-12 mb-3 d-flex align-items-center justify-content-between">
+                <span class="badge bg-success fs-6 p-2">Sistemde Kayıtlı Onaylı Atölyeler</span>
+                <small class="text-muted">{{ workshops|length }} atölye bulundu</small>
+            </div>
+
+            {% for ws in workshops %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h5 class="card-title fw-bold text-dark mb-0">{{ ws.title }}</h5>
+                                {% if ws.calculated_distance %}
+                                    <span class="badge bg-info text-dark">{{ ws.calculated_distance }} km</span>
+                                {% endif %}
+                            </div>
+                            <p class="text-muted small mb-2"><i class="bi bi-geo-alt"></i> {{ ws.district }}, {{ ws.city }}</p>
+                            <span class="badge bg-primary mb-3">{{ ws.get_category_display }}</span>
+
+                            <hr class="my-2">
+                            <p class="mb-1 text-secondary"><strong>Telefon:</strong> {{ ws.phone }}</p>
+                            {% if ws.capacity %}
+                                <p class="mb-1 text-secondary"><strong>Kapasite:</strong> {{ ws.capacity }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer bg-transparent border-0 pb-3">
+                            <a href="tel:{{ ws.phone }}" class="btn btn-outline-primary w-100 fw-semibold">
+                                📞 Hemen İletişime Geç
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+
+        {% else %}
+            <!-- HİÇ KULLANICI / ATÖLYE OLMADIĞINDA DEVREYE GİREN DÜZEN -->
+            <div class="col-12">
+                <div class="alert alert-warning p-4 text-center shadow-sm rounded-3">
+                    <h4 class="alert-heading fw-bold mb-2">Bu arama kriterlerinde sistemimizde kayıtlı atölye bulunamadı.</h4>
+                    <p class="text-muted mb-4">
+                        Aşağıdaki Google Haritalar butonunu kullanarak bölgedeki işletmelere doğrudan ulaşabilirsiniz:
+                    </p>
+
+                    <!-- GOOGLE MAPS CANLI LINKI -->
+                    {% if google_maps_search_url %}
+                        <a href="{{ google_maps_search_url }}" target="_blank" class="btn btn-danger btn-lg shadow-sm fw-bold px-4">
+                            🗺️ {{ selected_city|default:"Bölgenizdeki" }} Atölyeleri Google Haritalar'da Gör
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- OPENSTREETMAP REHBER VERİLERİ -->
+            {% if external_workshops %}
+                <div class="col-12 mt-3 mb-3">
+                    <h5 class="fw-bold text-secondary">Açık Harita Dizinindeki Bölge İşletmeleri:</h5>
+                </div>
+
+                {% for ext in external_workshops %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 border-warning shadow-sm">
+                            <div class="card-body">
+                                <span class="badge bg-warning text-dark mb-2">Rehber Kaydı</span>
+                                <h5 class="card-title fw-bold">{{ ext.title }}</h5>
+                                <p class="text-muted small mb-2">{{ ext.address }}</p>
+                                <p class="mb-0"><strong>Telefon:</strong> {{ ext.phone }}</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-0 pb-3">
+                                {% if ext.phone != 'Belirtilmedi' %}
+                                    <a href="tel:{{ ext.phone }}" class="btn btn-success w-100 mb-2">
+                                        📞 Firmayı Ara
+                                    </a>
+                                {% endif %}
+                                <a href="/accounts/register/" class="btn btn-sm btn-link text-decoration-none w-100 text-center text-muted">
+                                    Bu firma siz misiniz? Ücretsiz Sahiplenin
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+        {% endif %}
+    </div>
+</div>
+
+<!-- TARAYICI KONUM ALMA KODU -->
+<script>
+function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            document.getElementById("userLat").value = position.coords.latitude;
+            document.getElementById("userLng").value = position.coords.longitude;
+            alert("Konumunuz alındı. Filtrele butonuna basarak arama yapabilirsiniz.");
+        }, function(error) {
+            alert("Konum alınamadı. Lütfen tarayıcı konum izninizi kontrol edin.");
+        });
+    } else {
+        alert("Tarayıcınız konum özelliğini desteklemiyor.");
+    }
+}
+</script>
+{% endblock %}

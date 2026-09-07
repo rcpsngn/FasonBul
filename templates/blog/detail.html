@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ post.title }} | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'blog:list' %}">Blog</a></li>
+                    {% if post.category %}
+                    <li class="breadcrumb-item"><a href="{% url 'blog:category_list' post.category.slug %}">{{ post.category.name }}</a></li>
+                    {% endif %}
+                    <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+                </ol>
+            </nav>
+
+            <h1 class="fw-bold mb-3">{{ post.title }}</h1>
+            <div class="d-flex align-items-center text-muted mb-4">
+                <small class="me-3">Yazar: <strong>{{ post.author.get_full_name|default:post.author.username }}</strong></small>
+                <small class="me-3">Tarih: {{ post.created_at|date:"d M Y" }}</small>
+                <small>Okunma: {{ post.views_count }}</small>
+            </div>
+
+            {% if post.image %}
+            <img src="{{ post.image.url }}" class="img-fluid rounded mb-4 w-100" alt="{{ post.title }}">
+            {% endif %}
+
+            <div class="blog-content leading-relaxed fs-5">
+                {{ post.content|linebreaks }}
+            </div>
+
+            <hr class="my-5">
+
+            {% if recent_posts %}
+            <h4 class="fw-bold mb-4">Son Eklenen Diğer Yazılar</h4>
+            <div class="row">
+                {% for recent in recent_posts %}
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-body">
+                            <h6 class="card-title fw-bold">
+                                <a href="{% url 'blog:detail' recent.slug %}" class="text-decoration-none text-dark">{{ recent.title }}</a>
+                            </h6>
+                            <small class="text-muted">{{ recent.created_at|date:"d M Y" }}</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

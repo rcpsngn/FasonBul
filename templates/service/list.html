@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Hizmetlerimiz | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Tekstil Hizmetlerimiz</h1>
+        <p class="text-muted">Fason imalat süreçlerinde sunduğumuz profesyonel çözümler.</p>
+    </div>
+
+    <!-- Kategoriler -->
+    {% if categories %}
+    <div class="d-flex justify-content-center flex-wrap gap-2 mb-4">
+        <a href="{% url 'service:list' %}" class="btn btn-outline-primary btn-sm {% if not request.GET.category %}active{% endif %}">Tümü</a>
+        {% for cat in categories %}
+        <a href="?category={{ cat.slug }}" class="btn btn-outline-primary btn-sm {% if request.GET.category == cat.slug %}active{% endif %}">
+            {{ cat.name }}
+        </a>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Hizmet Listesi -->
+    <div class="row">
+        {% for service in services %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 200px; object-fit: cover;">
+                {% else %}
+                <div class="bg-light text-center py-5" style="height: 200px;">
+                    <i class="fs-1 text-secondary">🧵</i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <span class="badge bg-secondary mb-2">{{ service.category.name }}</span>
+                    <h5 class="card-title fw-bold">{{ service.title }}</h5>
+                    <p class="card-text text-muted">{{ service.short_description }}</p>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="{% url 'service:detail' service.slug %}" class="btn btn-primary w-100">Detaylı Bilgi</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <p class="text-muted fs-5">Bu kategoride henüz hizmet bulunmuyor.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

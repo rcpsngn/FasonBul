@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Hakkımızda | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    {% if about %}
+        <div class="row align-items-center mb-5">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold">{{ about.title }}</h1>
+                {% if about.subtitle %}
+                    <p class="lead text-muted">{{ about.subtitle }}</p>
+                {% endif %}
+                <hr class="my-4">
+                <p>{{ about.content|linebreaks }}</p>
+            </div>
+            {% if about.image %}
+            <div class="col-lg-6">
+                <img src="{{ about.image.url }}" alt="{{ about.title }}" class="img-fluid rounded shadow">
+            </div>
+            {% endif %}
+        </div>
+
+        {% if about.vision or about.mission %}
+        <div class="row my-5">
+            {% if about.vision %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    <div class="card-body">
+                        <h3 class="card-title text-primary">Vizyonumuz</h3>
+                        <p class="card-text">{{ about.vision }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if about.mission %}
+            <div class="col-md-6 mb-3">
+                <div class="card h-100 shadow-sm border-0 bg-light">
+                    <div class="card-body">
+                        <h3 class="card-title text-success">Misyonumuz</h3>
+                        <p class="card-text">{{ about.mission }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="alert alert-info text-center" role="alert">
+            Hakkımızda bilgileri henüz eklenmemiştir. Admin panelinden ekleyebilirsiniz.
+        </div>
+    {% endif %}
+
+    {% if statistics %}
+    <div class="row text-center my-5 bg-dark text-white p-4 rounded">
+        {% for stat in statistics %}
+        <div class="col-md-3 my-2">
+            <h2 class="fw-bold text-warning">{{ stat.value }}</h2>
+            <p class="mb-0">{{ stat.title }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

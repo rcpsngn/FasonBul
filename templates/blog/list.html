@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+
+{% block title %}Blog | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="fw-bold">{% if category %}{{ category.name }}{% else %}Sektörden Haberler & Blog{% endif %}</h1>
+            <p class="text-muted">Tekstil ve fason üretim dünyasından güncel yazılar.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Sol Taraf: Kategori Listesi -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">Kategoriler</h5>
+                    <div class="list-group list-group-flush mt-3">
+                        <a href="{% url 'blog:list' %}" class="list-group-item list-group-item-action {% if not category %}active{% endif %}">
+                            Tüm Yazılar
+                        </a>
+                        {% for cat in categories %}
+                        <a href="{% url 'blog:category_list' cat.slug %}" class="list-group-item list-group-item-action {% if category and category.id == cat.id %}active{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sağ Taraf: Blog Kartları -->
+        <div class="col-lg-9">
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        {% if post.image %}
+                        <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}" style="height: 200px; object-fit: cover;">
+                        {% endif %}
+                        <div class="card-body">
+                            {% if post.category %}
+                            <span class="badge bg-secondary mb-2">{{ post.category.name }}</span>
+                            {% endif %}
+                            <h5 class="card-title fw-bold">{{ post.title }}</h5>
+                            <p class="card-text text-muted">{{ post.summary|truncatewords:20 }}</p>
+                        </div>
+                        <div class="card-footer bg-transparent border-0 d-flex justify-content-between align-items-center">
+                            <small class="text-muted">{{ post.created_at|date:"d M Y" }}</small>
+                            <a href="{% url 'blog:detail' post.slug %}" class="btn btn-outline-primary btn-sm">Devamını Oku</a>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">Henüz yayınlanmış bir blog yazısı bulunmuyor.</div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

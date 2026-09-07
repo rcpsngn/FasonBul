@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ target_user.get_full_name|default:target_user.username }} | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <!-- Sol Panel: Profil Özeti (salt okunur) -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                {% if target_user.avatar %}
+                <img src="{{ target_user.avatar.url }}" class="rounded-circle mx-auto mb-3" style="width: 120px; height: 120px; object-fit: cover;" alt="{{ target_user.username }}">
+                {% else %}
+                <div class="rounded-circle bg-secondary text-white d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px; font-size: 2.5rem;">
+                    {{ target_user.username|first|upper }}
+                </div>
+                {% endif %}
+                <h4 class="fw-bold mb-1">{{ target_user.get_full_name|default:target_user.username }}</h4>
+                <p class="text-muted mb-2">{{ target_user.get_role_display }}</p>
+
+                {% if profile.company_name %}
+                <p class="badge bg-light text-dark border">{{ profile.company_name }}</p>
+                {% endif %}
+
+                {% if profile.is_verified %}
+                <span class="badge bg-success mb-2"><i class="fa fa-check-circle"></i> Doğrulanmış (Vergi Levhalı)</span>
+                {% else %}
+                <span class="badge bg-secondary mb-2">Henüz Doğrulanmadı</span>
+                {% endif %}
+
+                <hr>
+
+                <div class="text-start small">
+                    <p class="mb-2"><strong>Telefon:</strong> {{ target_user.phone|default:"Belirtilmedi" }}</p>
+                    <p class="mb-0"><strong>Konum:</strong> {{ target_user.city|default:"Belirtilmedi" }}</p>
+                </div>
+            </div>
+
+            {% if machines %}
+            <div class="card border-0 shadow-sm p-4 mt-4">
+                <h6 class="fw-bold mb-3">Makine Parkuru</h6>
+                <ul class="list-unstyled mb-0 small">
+                    {% for machine in machines %}
+                    <li class="mb-1">{{ machine.name }} — {{ machine.quantity }} adet</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sağ Panel: Belgeler ve Görüntüleme İstekleri -->
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm p-4">
+                <h4 class="fw-bold mb-3">Belgeler</h4>
+                <p class="text-muted small">
+                    Bu kullanıcının belgelerini görüntülemek için önce bir istek göndermeniz,
+                    kullanıcının da bu isteği onaylaması gerekir.
+                </p>
+
+                {% if doc_rows %}
+                <ul class="list-group">
+                    {% for row in doc_rows %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong>{{ row.document.get_document_type_display }}</strong>
+                            <span class="text-muted small">— {{ row.document.uploaded_at|date:"d.m.Y H:i" }}</span>
+                        </span>
+
+                        {% with access_request=row.access_request %}
+                        {% if access_request and access_request.status == 'APPROVED' %}
+                            <button type="button"
+                                    class="btn btn-sm btn-outline-primary"
+                                    onclick="return confirmDocumentView('{{ row.document.file.url }}', '{{ row.document.get_document_type_display }}')">
+                                Görüntüle
+                            </button>
+                        {% elif access_request and access_request.status == 'PENDING' %}
+                            <span class="badge bg-warning text-dark">İstek Gönderildi — Onay Bekleniyor</span>
+                        {% elif access_request and access_request.status == 'DENIED' %}
+                            <form method="post" action="{% url 'accounts:document_request_access' row.document.pk %}" class="mb-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="İstek reddedilmişti, tekrar gönder">
+                                    Reddedildi — Tekrar İste
+                                </button>
+                            </form>
+                        {% else %}
+                            <form method="post" action="{% url 'accounts:document_request_access' row.document.pk %}" class="mb-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Görüntüleme İsteği Gönder</button>
+                            </form>
+                        {% endif %}
+                        {% endwith %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted">Bu kullanıcı henüz belge yüklememiş.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function confirmDocumentView(fileUrl, docTypeLabel) {
+    const onayVerildi = confirm(
+        docTypeLabel + " belgesini görüntülemek üzeresiniz. Bu hassas bir belge olabilir. " +
+        "Devam etmek istediğinize emin misiniz?"
+    );
+    if (onayVerildi) {
+        window.open(fileUrl, '_blank');
+    }
+    return false;
+}
+</script>
+{% endblock %}

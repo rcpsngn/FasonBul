@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ advert.title }} | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8">
+            <h1 class="fw-bold mb-3">{{ advert.title }}</h1>
+            <p class="text-muted">
+                <span class="badge bg-primary">{{ advert.category.name }}</span>
+                <span class="badge bg-secondary">{{ advert.get_advert_type_display }}</span>
+                • Tarih: {{ advert.created_at|date:"d M Y" }}
+            </p>
+
+            {% if advert.image %}
+            <img src="{{ advert.image.url }}" class="img-fluid rounded mb-4 w-100" alt="{{ advert.title }}">
+            {% endif %}
+
+            <h4 class="fw-bold mt-4">İlan Detayı</h4>
+            <p class="fs-5">{{ advert.description|linebreaks }}</p>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm p-4">
+                <h4 class="fw-bold mb-3">İlan Bilgileri</h4>
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Şehir / İlçe:</strong> <span>{{ advert.city }} / {{ advert.district }}</span>
+                    </li>
+                    {% if advert.quantity %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Miktar:</strong> <span>{{ advert.quantity }} Adet</span>
+                    </li>
+                    {% endif %}
+                    {% if advert.price %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Birim Fiyat:</strong> <span>{{ advert.price }} TL</span>
+                    </li>
+                    {% endif %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>İlan Sahibi:</strong> <span>{{ advert.owner.username }}</span>
+                    </li>
+                </ul>
+                <a href="mailto:{{ advert.owner.email }}" class="btn btn-success w-100">İletişime Geç</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

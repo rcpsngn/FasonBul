@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Ana Sayfa | FasonBul{% endblock %}
+
+{% block content %}
+<!-- Hero / Banner Alanı -->
+{% if banners %}
+<div id="mainCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
+    <div class="carousel-inner">
+        {% for banner in banners %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+            {% if banner.image %}
+            <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}" style="height: 400px; object-fit: cover;">
+            {% else %}
+            <div class="bg-dark text-white text-center py-5" style="height: 400px; display: flex; flex-direction: column; justify-content: center;">
+                <div class="container">
+                    <h1 class="display-4 fw-bold">{{ banner.title }}</h1>
+                    {% if banner.subtitle %}<p class="lead">{{ banner.subtitle }}</p>{% endif %}
+                    {% if banner.button_text %}
+                    <a href="{{ banner.button_url|default:'#' }}" class="btn btn-primary btn-lg mt-3">{{ banner.button_text }}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% else %}
+<!-- Varsayılan Hero Alanı -->
+<div class="bg-primary text-white text-center py-5 mb-5">
+    <div class="container my-4">
+        <h1 class="display-4 fw-bold">Tekstil Fason İş Ve Atölye İlanları</h1>
+        <p class="lead">İhtiyacınıza uygun fason atölyesini bulun veya kapasitenize uygun iş ilanlarına başvurun.</p>
+        <a href="{% url 'workshop:list' %}" class="btn btn-light btn-lg me-2 mt-2">İlanları İncele</a>
+        <a href="{% url 'workshop:create' %}" class="btn btn-outline-light btn-lg mt-2">+ İlan Ver</a>
+    </div>
+</div>
+{% endif %}
+
+<div class="container">
+    <!-- İstatistikler -->
+    {% if statistics %}
+    <div class="row text-center mb-5">
+        {% for stat in statistics %}
+        <div class="col-md-3 mb-3">
+            <div class="card border-0 shadow-sm p-3">
+                <h2 class="fw-bold text-primary">{{ stat.value }}</h2>
+                <p class="text-muted mb-0">{{ stat.title }}</p>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Son Eklenen Fason İlanları -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="fw-bold m-0">Son Fason İlanları</h3>
+        <a href="{% url 'workshop:list' %}" class="btn btn-outline-primary btn-sm">Tüm İlanlar &rarr;</a>
+    </div>
+
+    <div class="row mb-5">
+        {% for advert in latest_adverts %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-0 shadow-sm">
+                {% if advert.image %}
+                <img src="{{ advert.image.url }}" class="card-img-top" alt="{{ advert.title }}" style="height: 180px; object-fit: cover;">
+                {% else %}
+                <div class="bg-secondary text-white text-center py-5">Görsel Yok</div>
+                {% endif %}
+                <div class="card-body">
+                    {% if advert.get_category_display %}
+                    <span class="badge bg-info text-dark mb-2">{{ advert.get_category_display }}</span>
+                    {% endif %}
+                    <h5 class="card-title fw-bold">{{ advert.title }}</h5>
+                    <p class="card-text text-muted">{{ advert.description|default:''|truncatewords:12 }}</p>
+                    <small class="text-muted">📍 {{ advert.city }} {% if advert.district %}/ {{ advert.district }}{% endif %}</small>
+                </div>
+                <div class="card-footer bg-transparent border-0">
+                    <a href="#" class="btn btn-sm btn-primary w-100">İlanı İncele</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <!-- KAYITLI İLAN BULUNAMADIĞINDA ÇIKACAK BÖLÜM -->
+        <div class="col-12">
+            <div class="card text-center border-0 shadow-sm p-5 my-3">
+                <div class="card-body">
+                    <i class="fa-solid fa-building-circle-xmark text-muted fa-4x mb-3"></i>
+                    <h4 class="fw-bold">Sistemde Henüz Kayıtlı Fason İlanı Bulunmuyor</h4>
+                    <p class="text-muted mb-4">
+                        Sitemize henüz bir atölye ilanı eklenmedi. Dilerseniz harita servisimiz üzerinden bölgenizdeki fason atölyeleri arayabilirsiniz.
+                    </p>
+                    <a href="{% url 'workshop:map_search' %}" class="btn btn-danger btn-lg">
+                        <i class="fa-solid fa-map-location-dot me-2"></i> Haritada Atölyeleri İncele
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
