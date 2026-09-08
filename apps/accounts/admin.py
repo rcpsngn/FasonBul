@@ -14,7 +14,7 @@ class CustomUserAdmin(UserAdmin):
     model = User
     list_display = ("username", "email", "first_name", "last_name", "role", "is_staff")
     list_filter = ("role", "is_staff", "is_active", "city")
-    search_fields = ("username", "email", "first_name", "last_name")
+    search_fields = ("username", "email", "first_name", "last_name", "profile__company_name")
 
     fieldsets = UserAdmin.fieldsets + (
         ('Ek Bilgiler', {'fields': ('role', 'phone', 'city', 'avatar')}),

@@ -4,6 +4,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
+from django.db.models import Q
 
 from .forms import (
     CustomUserCreationForm,
@@ -211,3 +212,23 @@ def machine_delete_view(request, pk):
     machine.delete()
     messages.info(request, 'Makine kaydı silindi.')
     return redirect('accounts:profile')
+
+
+@login_required
+def user_search_view(request):
+    query = request.GET.get('q', '').strip()
+    results = []
+
+    if query:
+        results = User.objects.filter(
+            Q(profile__company_name__icontains=query) |
+            Q(username__icontains=query) |
+            Q(first_name__icontains=query) |
+            Q(last_name__icontains=query)
+        ).exclude(pk=request.user.pk).distinct()
+
+    context = {
+        'query': query,
+        'results': results,
+    }
+    return render(request, 'accounts/user_search.html', context)

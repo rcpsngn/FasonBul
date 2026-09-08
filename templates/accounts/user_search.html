@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Firma / Atölye Ara | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h3 class="fw-bold mb-4">Firma / Atölye Ara</h3>
+
+    <form method="get" class="card border-0 shadow-sm p-3 mb-4">
+        <div class="input-group">
+            <input type="text" name="q" class="form-control" placeholder="Firma veya kullanıcı adı yazın..." value="{{ query }}">
+            <button type="submit" class="btn btn-primary">Ara</button>
+        </div>
+    </form>
+
+    {% if query %}
+        {% if results %}
+            <div class="list-group shadow-sm">
+                {% for user in results %}
+                <a href="{% url 'accounts:public_profile' user.username %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>{{ user.profile.company_name|default:user.get_full_name|default:user.username }}</strong>
+                        <span class="text-muted small">— {{ user.get_role_display }}</span>
+                    </span>
+                    {% if user.profile.is_verified %}
+                    <span class="badge bg-success">Doğrulanmış</span>
+                    {% endif %}
+                </a>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">"{{ query }}" ile eşleşen bir sonuç bulunamadı.</p>
+        {% endif %}
+    {% else %}
+        <p class="text-muted">Aramak istediğiniz firma veya atölye adını yazıp Enter'a basın.</p>
+    {% endif %}
+</div>
+{% endblock %}

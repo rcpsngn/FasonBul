@@ -35,6 +35,14 @@ class Workshop(models.Model):
     longitude = models.FloatField(null=True, blank=True, verbose_name="Boylam (Lng)")
 
     capacity = models.CharField(max_length=100, blank=True, null=True, verbose_name="Aylık Kapasite (Parça)")
+
+    email = models.EmailField(blank=True, null=True, verbose_name="E-posta Adresi")
+    employee_count = models.PositiveIntegerField(blank=True, null=True, verbose_name="Çalışan Sayısı")
+    daily_capacity = models.PositiveIntegerField(blank=True, null=True, verbose_name="Günlük Üretim Kapasitesi (Adet)")
+    description = models.TextField(blank=True, null=True, verbose_name="Atölye Açıklaması / Uzmanlık Alanları")
+    logo = models.ImageField(upload_to="workshops/logos/", blank=True, null=True, verbose_name="Atölye Logosu")
+    cover_image = models.ImageField(upload_to="workshops/covers/", blank=True, null=True, verbose_name="Kapak Görseli")
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Kayıt Tarihi")
 
     class Meta:

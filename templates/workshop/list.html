@@ -13,8 +13,14 @@
             <input type="hidden" name="user_lng" id="userLng" value="{{ request.GET.user_lng }}">
 
             <div class="row g-3">
+                <!-- Atölye / Firma Adı -->
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold">Atölye / Firma Adı</label>
+                    <input type="text" name="q" class="form-control" placeholder="İsimle ara" value="{{ search_query }}">
+                </div>
+
                 <!-- Şehir -->
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold">Şehir</label>
                     <input type="text" name="city" class="form-control" placeholder="Örn: Bursa, İstanbul" value="{{ selected_city }}">
                 </div>
@@ -31,7 +37,7 @@
                 </div>
 
                 <!-- Mesafe Filtresi -->
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label class="form-label fw-semibold">Mesafe Yarıçapı</label>
                     <select name="distance" class="form-select">
                         <option value="">Mesafe Sınırlaması Yok</option>
@@ -81,10 +87,9 @@
                                 <p class="mb-1 text-secondary"><strong>Kapasite:</strong> {{ ws.capacity }}</p>
                             {% endif %}
                         </div>
-                        <div class="card-footer bg-transparent border-0 pb-3">
-                            <a href="tel:{{ ws.phone }}" class="btn btn-outline-primary w-100 fw-semibold">
-                                📞 Hemen İletişime Geç
-                            </a>
+                        <div class="card-footer bg-transparent border-0 pb-3 d-flex gap-2">
+                            <a href="{% url 'workshop:detail' ws.pk %}" class="btn btn-primary w-50 fw-semibold">İncele</a>
+                            <a href="tel:{{ ws.phone }}" class="btn btn-outline-primary w-50 fw-semibold">📞 Ara</a>
                         </div>
                     </div>
                 </div>
