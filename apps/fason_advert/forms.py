@@ -1,5 +1,5 @@
 from django import forms
-from .models import Advert
+from .models import Advert, Proposal
 
 
 class AdvertForm(forms.ModelForm):
@@ -16,4 +16,15 @@ class AdvertForm(forms.ModelForm):
             'quantity': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Adet sayısı'}),
             'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Birim fiyat (isteğe bağlı)'}),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+
+class ProposalForm(forms.ModelForm):
+    class Meta:
+        model = Proposal
+        fields = ['message', 'price_offer', 'quantity_offer']
+        widgets = {
+            'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Teklifinizi ve varsa şartlarınızı yazın...'}),
+            'price_offer': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Birim fiyat teklifiniz (opsiyonel)'}),
+            'quantity_offer': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Karşılayabileceğiniz adet (opsiyonel)'}),
         }

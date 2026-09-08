@@ -5,9 +5,23 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 align-items-lg-center">
                 <li class="nav-item">
-                    <a class="nav-link {% if request.resolver_match.app_name == 'workshop' %}active{% endif %}" href="{% url 'workshop:list' %}">Atölyeler</a>
+                    <a class="nav-link" href="{% url 'workshop:list' %}">Atölyeler</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'fason_advert:list' %}">İlanlar</a>
+                </li>
+                {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'fason_advert:my_proposals' %}">Tekliflerim</a>
+                </li>
+                {% endif %}
+                <li class="nav-item">
+                    <form method="get" action="{% url 'accounts:user_search' %}" class="d-flex ms-lg-2" role="search">
+                        <input type="text" name="q" class="form-control form-control-sm" placeholder="Firma / Atölye Ara" style="min-width: 180px;">
+                        <button type="submit" class="btn btn-sm btn-outline-light ms-1">Ara</button>
+                    </form>
                 </li>
             </ul>
 
@@ -16,25 +30,28 @@
                     <li class="nav-item me-2 mb-2 mb-lg-0">
                         <a href="{% url 'workshop:create' %}" class="btn btn-outline-light btn-sm">+ Atölye Ekle</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active d-flex align-items-center gap-2" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                    <li class="nav-item me-2 mb-2 mb-lg-0">
+                        <a href="{% url 'fason_advert:create' %}" class="btn btn-outline-light btn-sm">+ İlan Ver</a>
+                    </li>
+                    <li class="nav-item me-2 mb-2 mb-lg-0">
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-primary btn-sm">
                             {% if user.avatar %}
-                                <img src="{{ user.avatar.url }}" class="rounded-circle" style="width: 28px; height: 28px; object-fit: cover;">
+                                <img src="{{ user.avatar.url }}" class="rounded-circle me-1" style="width: 20px; height: 20px; object-fit: cover;">
                             {% endif %}
-                            <span>{{ user.first_name|default:user.username }}</span>
+                            Profilim
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm">
-                            <li><a class="dropdown-item" href="{% url 'accounts:profile' %}">Profilim ve Ayarlar</a></li>
-                            {% if user.is_staff %}
-                                <li><a class="dropdown-item text-warning" href="/admin/" target="_blank">Yönetici Paneli</a></li>
-                            {% endif %}
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="{% url 'accounts:logout' %}">Çıkış Yap</a></li>
-                        </ul>
+                    </li>
+                    {% if user.is_staff %}
+                    <li class="nav-item me-2 mb-2 mb-lg-0">
+                        <a href="/admin/" target="_blank" class="btn btn-outline-warning btn-sm">Yönetici Paneli</a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm">Çıkış Yap</a>
                     </li>
                 {% else %}
                     <li class="nav-item me-2">
-                        <a class="nav-link" href="{% url 'accounts:login' %}">Giriş Yap</a>
+                        <a class="btn btn-outline-light btn-sm" href="{% url 'accounts:login' %}">Giriş Yap</a>
                     </li>
                     <li class="nav-item">
                         <a class="btn btn-primary btn-sm px-3" href="{% url 'accounts:register' %}">Kayıt Ol</a>

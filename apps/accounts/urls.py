@@ -12,6 +12,7 @@ urlpatterns = [
     path('belge/<int:pk>/sil/', views.document_delete_view, name='document_delete'),
     path('makine/ekle/', views.machine_add_view, name='machine_add'),
     path('makine/<int:pk>/sil/', views.machine_delete_view, name='machine_delete'),
+    path('ara/', views.user_search_view, name='user_search'),
 
     # Belge görüntüleme izin akışı
     path('profil/<str:username>/', views.public_profile_view, name='public_profile'),

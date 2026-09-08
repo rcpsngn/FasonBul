@@ -19,6 +19,53 @@
 
             <h4 class="fw-bold mt-4">İlan Detayı</h4>
             <p class="fs-5">{{ advert.description|linebreaks }}</p>
+
+            <!-- TEKLİF ALANI -->
+            {% if is_owner %}
+                <div class="card border-0 shadow-sm p-4 mt-4 bg-light">
+                    <h5 class="fw-bold mb-2">Bu sizin ilanınız</h5>
+                    <p class="text-muted mb-3">Gelen teklifleri görüntülemek ve yanıtlamak için:</p>
+                    <a href="{% url 'fason_advert:advert_proposals' advert.slug %}" class="btn btn-primary">Gelen Teklifleri Gör</a>
+                </div>
+            {% elif my_proposal and my_proposal.status != 'REJECTED' %}
+                <div class="card border-0 shadow-sm p-4 mt-4">
+                    <h5 class="fw-bold mb-2">Teklifiniz</h5>
+                    {% if my_proposal.status == 'PENDING' %}
+                        <span class="badge bg-warning text-dark mb-2 align-self-start">Bekliyor</span>
+                    {% elif my_proposal.status == 'ACCEPTED' %}
+                        <span class="badge bg-success mb-2 align-self-start">Kabul Edildi</span>
+                    {% endif %}
+                    <p class="mb-1">{{ my_proposal.message }}</p>
+                    {% if my_proposal.price_offer %}<p class="mb-1"><strong>Teklif Fiyatı:</strong> {{ my_proposal.price_offer }} TL</p>{% endif %}
+                    {% if my_proposal.quantity_offer %}<p class="mb-1"><strong>Karşılanabilecek Adet:</strong> {{ my_proposal.quantity_offer }}</p>{% endif %}
+                    {% if my_proposal.status == 'PENDING' %}
+                    <form method="post" action="{% url 'fason_advert:proposal_withdraw' my_proposal.pk %}" class="mt-2">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Teklifi Geri Çek</button>
+                    </form>
+                    {% endif %}
+                </div>
+            {% elif proposal_form %}
+                <div class="card border-0 shadow-sm p-4 mt-4">
+                    <h5 class="fw-bold mb-3">
+                        {% if my_proposal.status == 'REJECTED' %}Teklifiniz reddedilmişti — tekrar teklif verin{% else %}Bu İlana Teklif Ver{% endif %}
+                    </h5>
+                    <form method="post" action="{% url 'fason_advert:proposal_create' advert.slug %}">
+                        {% csrf_token %}
+                        {% for field in proposal_form %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">{{ field.label }}</label>
+                            {{ field }}
+                        </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">Teklifi Gönder</button>
+                    </form>
+                </div>
+            {% elif not request.user.is_authenticated %}
+                <div class="alert alert-info mt-4">
+                    Bu ilana teklif verebilmek için <a href="{% url 'accounts:login' %}?next={{ request.path }}">giriş yapmanız</a> gerekiyor.
+                </div>
+            {% endif %}
         </div>
 
         <div class="col-lg-4">
@@ -42,6 +89,7 @@
                         <strong>İlan Sahibi:</strong> <span>{{ advert.owner.username }}</span>
                     </li>
                 </ul>
+                <a href="{% url 'accounts:public_profile' advert.owner.username %}" class="btn btn-outline-primary w-100 mb-2">İlan Sahibinin Profili</a>
                 <a href="mailto:{{ advert.owner.email }}" class="btn btn-success w-100">İletişime Geç</a>
             </div>
         </div>

@@ -1,20 +1,22 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ workshop.name }} | FasonBul{% endblock %}
+{% block title %}{{ workshop.title }} | FasonBul{% endblock %}
 
 {% block content %}
 <div class="container my-5">
     <div class="row">
         <div class="col-lg-8">
             {% if workshop.cover_image %}
-            <img src="{{ workshop.cover_image.url }}" class="img-fluid rounded mb-4 w-100" style="max-height: 350px; object-fit: cover;" alt="{{ workshop.name }}">
+            <img src="{{ workshop.cover_image.url }}" class="img-fluid rounded mb-4 w-100" style="max-height: 350px; object-fit: cover;" alt="{{ workshop.title }}">
             {% endif %}
 
-            <h1 class="fw-bold mb-2">{{ workshop.name }}</h1>
-            <p class="text-muted"><span class="badge bg-primary">{{ workshop.category.name }}</span> • 📍 {{ workshop.city }} / {{ workshop.district }}</p>
+            <h1 class="fw-bold mb-2">{{ workshop.title }}</h1>
+            <p class="text-muted"><span class="badge bg-primary">{{ workshop.get_category_display }}</span> • 📍 {{ workshop.city }} / {{ workshop.district }}</p>
 
+            {% if workshop.description %}
             <h4 class="fw-bold mt-4">Hakkında / Açıklama</h4>
             <p class="fs-5">{{ workshop.description|linebreaks }}</p>
+            {% endif %}
 
             <!-- Makine Parkuru -->
             {% if machines %}
@@ -50,6 +52,11 @@
                     <li class="list-group-item d-flex justify-content-between">
                         <strong>Günlük Kapasite:</strong> <span>{{ workshop.daily_capacity|default:"Belirtilmedi" }} Adet</span>
                     </li>
+                    {% if workshop.capacity %}
+                    <li class="list-group-item d-flex justify-content-between">
+                        <strong>Aylık Kapasite:</strong> <span>{{ workshop.capacity }}</span>
+                    </li>
+                    {% endif %}
                 </ul>
             </div>
 
@@ -58,6 +65,7 @@
                 <p class="mb-2"><strong>Telefon:</strong><br>{{ workshop.phone }}</p>
                 {% if workshop.email %}<p class="mb-2"><strong>E-posta:</strong><br>{{ workshop.email }}</p>{% endif %}
                 {% if workshop.address %}<p class="mb-2"><strong>Adres:</strong><br>{{ workshop.address }}</p>{% endif %}
+                <a href="{% url 'accounts:public_profile' workshop.owner.username %}" class="btn btn-outline-primary w-100 mt-2">Atölye Sahibinin Profilini Gör</a>
             </div>
         </div>
     </div>

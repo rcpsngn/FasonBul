@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AdvertCategory, Advert
+from .models import AdvertCategory, Advert, Proposal
 
 
 @admin.register(AdvertCategory)
@@ -15,3 +15,11 @@ class AdvertAdmin(admin.ModelAdmin):
     search_fields = ("title", "description", "city", "district")
     prepopulated_fields = {"slug": ("title",)}
     raw_id_fields = ("owner",)
+
+
+@admin.register(Proposal)
+class ProposalAdmin(admin.ModelAdmin):
+    list_display = ("advert", "bidder", "status", "price_offer", "quantity_offer", "created_at", "responded_at")
+    list_filter = ("status",)
+    search_fields = ("advert__title", "bidder__username")
+    raw_id_fields = ("advert", "bidder")

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Tekliflerim | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4">Gönderdiğim Teklifler</h2>
+
+    {% if proposals %}
+        {% for proposal in proposals %}
+        <div class="card border-0 shadow-sm p-4 mb-3">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                    <h5 class="fw-bold mb-1">
+                        <a href="{% url 'fason_advert:detail' proposal.advert.slug %}">{{ proposal.advert.title }}</a>
+                    </h5>
+                    <span class="text-muted small">{{ proposal.created_at|date:"d M Y H:i" }} — İlan sahibi: {{ proposal.advert.owner.username }}</span>
+                </div>
+                {% if proposal.status == 'PENDING' %}
+                    <span class="badge bg-warning text-dark">Bekliyor</span>
+                {% elif proposal.status == 'ACCEPTED' %}
+                    <span class="badge bg-success">Kabul Edildi</span>
+                {% elif proposal.status == 'REJECTED' %}
+                    <span class="badge bg-secondary">Reddedildi</span>
+                {% endif %}
+            </div>
+            <p class="mb-2">{{ proposal.message|linebreaks }}</p>
+            <div class="d-flex gap-4 text-secondary small">
+                {% if proposal.price_offer %}<span><strong>Teklif Fiyatı:</strong> {{ proposal.price_offer }} TL</span>{% endif %}
+                {% if proposal.quantity_offer %}<span><strong>Karşılanabilecek Adet:</strong> {{ proposal.quantity_offer }}</span>{% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-info">Henüz herhangi bir ilana teklif göndermediniz.</div>
+    {% endif %}
+</div>
+{% endblock %}

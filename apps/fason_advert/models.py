@@ -6,6 +6,7 @@ User = get_user_model()
 
 
 class AdvertCategory(models.Model):
+    objects = None
     name = models.CharField(max_length=100, verbose_name="Kategori Adı")
     slug = models.SlugField(unique=True, blank=True, verbose_name="Slug")
 
@@ -23,6 +24,7 @@ class AdvertCategory(models.Model):
 
 
 class Advert(models.Model):
+    objects = None
     ADVERT_TYPES = (
         ('capacity', 'Atölye Kapasite İlanı (İş Arıyor)'),
         ('job', 'Fason İşi Veren İlanı (Atölye Arıyor)'),
@@ -55,3 +57,34 @@ class Advert(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Proposal(models.Model):
+    """Bir atölyenin (ya da firmanın) bir ilana verdiği teklif.
+    unique_together sayesinde aynı kullanıcı aynı ilana birden fazla AKTİF teklif
+    gönderemez; reddedilen bir teklif üzerine tekrar teklif verilebilir (aynı kayıt güncellenir)."""
+
+    objects = None
+
+    class Status(models.TextChoices):
+        PENDING = 'PENDING', 'Bekliyor'
+        ACCEPTED = 'ACCEPTED', 'Kabul Edildi'
+        REJECTED = 'REJECTED', 'Reddedildi'
+
+    advert = models.ForeignKey(Advert, on_delete=models.CASCADE, related_name='proposals', verbose_name="İlan")
+    bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_proposals', verbose_name="Teklif Veren")
+    message = models.TextField(verbose_name="Teklif Mesajı")
+    price_offer = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Teklif Edilen Birim Fiyat (TL)")
+    quantity_offer = models.PositiveIntegerField(blank=True, null=True, verbose_name="Karşılanabilecek Adet")
+    status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, verbose_name="Durum")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Gönderilme Tarihi")
+    responded_at = models.DateTimeField(blank=True, null=True, verbose_name="Yanıt Tarihi")
+
+    class Meta:
+        verbose_name = "Teklif"
+        verbose_name_plural = "Teklifler"
+        unique_together = ('advert', 'bidder')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.bidder} -> {self.advert} ({self.get_status_display()})"
