@@ -4,25 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e6bb3530-f875-463f-a2b7-1f7202367eb5" name="Changes" comment="08.09.2026 rcp">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/KURULUM_TALIMATLARI.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/admin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/apps.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/apps.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/migrations/0001_initial.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/migrations/0001_initial.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/apps/fason_advert/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/apps/fason_advert/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/accounts/user_search.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/accounts/user_search.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/fason_advert/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/fason_advert/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/includes/_navbar.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/includes/_navbar.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/workshop/detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/workshop/detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/workshop/form.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/workshop/form.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/workshop/list.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/workshop/list.html" afterDir="false" />
-    </list>
+    <list default="true" id="e6bb3530-f875-463f-a2b7-1f7202367eb5" name="Changes" comment="09.09.2026 rcp1" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -149,7 +131,23 @@
       <option name="project" value="LOCAL" />
       <updated>1788862015273</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="09.09.2026 rcp">
+      <option name="closed" value="true" />
+      <created>1788938526263</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1788938526263</updated>
+    </task>
+    <task id="LOCAL-00004" summary="09.09.2026 rcp1">
+      <option name="closed" value="true" />
+      <created>1788938553381</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1788938553381</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -158,6 +156,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="07.09.2026 rcp" />
     <MESSAGE value="08.09.2026 rcp" />
-    <option name="LAST_COMMIT_MESSAGE" value="08.09.2026 rcp" />
+    <MESSAGE value="09.09.2026 rcp" />
+    <MESSAGE value="09.09.2026 rcp1" />
+    <option name="LAST_COMMIT_MESSAGE" value="09.09.2026 rcp1" />
   </component>
 </project>
