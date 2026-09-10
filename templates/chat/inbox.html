@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Mesajlarım | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h2 class="fw-bold mb-4">Mesajlarım</h2>
+
+    {% if conversations %}
+        <div class="list-group shadow-sm">
+            {% for conv in conversations %}
+            <a href="{% url 'chat:conversation_detail' conv.pk %}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <span>
+                    <strong>{{ conv.proposal.advert.title }}</strong>
+                    <span class="text-muted small">— {{ conv.other_user.profile.company_name|default:conv.other_user.username }}</span>
+                </span>
+                {% if conv.is_meeting_confirmed %}
+                <span class="badge bg-success">Yüz Yüze Görüşüldü</span>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">Henüz bir sohbetiniz yok. Bir teklif kabul edildiğinde burada görünecek.</div>
+    {% endif %}
+</div>
+{% endblock %}

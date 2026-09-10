@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %}Sözleşme {% if contract %}Düzenle{% else %}Oluştur{% endif %} | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 700px;">
+    <div class="card border-0 shadow-sm p-4">
+        <h3 class="fw-bold mb-2">Fason Sözleşmesi {% if contract %}Düzenle{% else %}Oluştur{% endif %}</h3>
+        <p class="text-muted small mb-4">
+            İlan: <strong>{{ conversation.proposal.advert.title }}</strong><br>
+            Bu formu doldurup kaydettiğinizde, karşı tarafın onayına gönderilecek.
+            {% if contract %}Şartları değiştirirseniz, daha önce verilmiş onaylar sıfırlanır.{% endif %}
+        </p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+            {% for field in form %}
+            <div class="mb-3">
+                <label class="form-label fw-semibold">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small mt-1">{{ field.errors|first }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary w-100">Sözleşmeyi Kaydet</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

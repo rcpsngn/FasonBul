@@ -13,8 +13,9 @@ urlpatterns = [
     path('ilanlar/', include('apps.fason_advert.urls', namespace='fason_advert')),
     path('hakkimizda/', include('apps.about.urls', namespace='about')),
     path('blog/', include('apps.blog.urls', namespace='blog')),
-    path('iletisim/', include('apps.contact.urls', namespace='contact')),
+    path('iletisim/', include('apps.contracts.urls', namespace='contracts')),
     path('hizmetler/', include('apps.service.urls', namespace='service')),
+    path('mesajlar/', include('apps.chat.urls', namespace='chat')),
 ]
 
 # Geliştirme (DEBUG) ortamında yüklenen resim/medya dosyalarının görüntülenebilmesi için:

@@ -50,6 +50,8 @@
                     <button type="submit" class="btn btn-outline-danger btn-sm">Reddet</button>
                 </form>
             </div>
+            {% elif proposal.status == 'ACCEPTED' %}
+            <a href="{% url 'chat:conversation_detail' proposal.conversation.pk %}" class="btn btn-primary btn-sm">💬 Sohbeti Aç</a>
             {% endif %}
         </div>
         {% endfor %}

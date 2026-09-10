@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+
+{% block title %}Fason Sözleşmesi | FasonBul{% endblock %}
+
+{% block extra_css %}
+<style>
+    @media print {
+        .no-print { display: none !important; }
+        .navbar, footer { display: none !important; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+
+    <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+        <h4 class="fw-bold m-0">Fason İmalat Sözleşmesi</h4>
+        <div class="d-flex gap-2">
+            {% if not contract.is_fully_approved %}
+            <a href="{% url 'contracts:contract_edit' conversation.pk %}" class="btn btn-outline-secondary btn-sm">Düzenle</a>
+            {% endif %}
+            <button onclick="window.print()" class="btn btn-outline-primary btn-sm">🖨️ Yazdır / PDF Kaydet</button>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm p-5">
+        <h3 class="text-center fw-bold mb-4">FASON İMALAT SÖZLEŞMESİ</h3>
+
+        <p>
+            İşbu sözleşme, aşağıda bilgileri yer alan <strong>İş Veren</strong> ile
+            <strong>İmalatçı (Atölye)</strong> arasında, FasonBul platformu üzerinden
+            eşleşen taraflarca kendi aralarında düzenlenmiştir.
+        </p>
+
+        <table class="table table-bordered my-4">
+            <tr>
+                <th style="width: 40%;">İş Veren</th>
+                <td>{{ contract.owner.profile.company_name|default:contract.owner.get_full_name|default:contract.owner.username }}</td>
+            </tr>
+            <tr>
+                <th>İmalatçı (Atölye)</th>
+                <td>{{ contract.bidder.profile.company_name|default:contract.bidder.get_full_name|default:contract.bidder.username }}</td>
+            </tr>
+            <tr>
+                <th>İlan / İş Konusu</th>
+                <td>{{ conversation.proposal.advert.title }}</td>
+            </tr>
+            <tr>
+                <th>Adet</th>
+                <td>{{ contract.quantity }}</td>
+            </tr>
+            <tr>
+                <th>Birim Fiyat</th>
+                <td>{{ contract.unit_price }} TL</td>
+            </tr>
+            <tr>
+                <th>Toplam Tutar</th>
+                <td><strong>{{ contract.total_amount }} TL</strong></td>
+            </tr>
+            <tr>
+                <th>Teslim / Vade Tarihi</th>
+                <td>{{ contract.due_date|date:"d.m.Y" }}</td>
+            </tr>
+            <tr>
+                <th>Kabul Edilebilir Fire Oranı</th>
+                <td>%{{ contract.defect_rate }}</td>
+            </tr>
+            {% if contract.extra_terms %}
+            <tr>
+                <th>Ek Şartlar</th>
+                <td>{{ contract.extra_terms|linebreaksbr }}</td>
+            </tr>
+            {% endif %}
+        </table>
+
+        <p class="small text-muted">
+            Taraflar, yukarıda belirtilen adet, fiyat, teslim tarihi ve fire oranı şartlarında
+            anlaştıklarını kabul ve beyan ederler. İşbu sözleşme metninin çıktısı alınarak
+            ıslak imza ile de teyit edilmesi önerilir.
+        </p>
+
+        <div class="alert alert-secondary small mt-4 mb-0">
+            <strong>Önemli Bilgilendirme:</strong> Bu sözleşme metni FasonBul platformu tarafından
+            bilgilendirme amacıyla, taraflar arasındaki anlaşmayı kayıt altına almaya yardımcı
+            olmak için sunulmuştur. <strong>FasonBul bu sözleşmenin tarafı değildir</strong> ve
+            içeriğinden doğacak anlaşmazlıklardan sorumlu tutulamaz. Taraflara, işe başlamadan
+            önce gerekirse bu metni bir hukuk danışmanına teyit ettirmeleri önerilir.
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-6 text-center">
+                <p class="mb-1">İş Veren</p>
+                {% if contract.owner_approved %}
+                    <span class="badge bg-success">✓ Onaylandı</span>
+                {% else %}
+                    <span class="badge bg-secondary">Onay Bekleniyor</span>
+                {% endif %}
+                <p class="small text-muted mt-2">İmza: ______________________</p>
+            </div>
+            <div class="col-6 text-center">
+                <p class="mb-1">İmalatçı (Atölye)</p>
+                {% if contract.bidder_approved %}
+                    <span class="badge bg-success">✓ Onaylandı</span>
+                {% else %}
+                    <span class="badge bg-secondary">Onay Bekleniyor</span>
+                {% endif %}
+                <p class="small text-muted mt-2">İmza: ______________________</p>
+            </div>
+        </div>
+    </div>
+
+    {% if not contract.is_fully_approved %}
+    <div class="card border-0 shadow-sm p-4 mt-4 no-print">
+        {% if request.user == contract.owner and contract.owner_approved %}
+            <p class="text-success fw-semibold mb-0">Bu sözleşmeyi zaten onayladınız, karşı tarafın onayı bekleniyor.</p>
+        {% elif request.user == contract.bidder and contract.bidder_approved %}
+            <p class="text-success fw-semibold mb-0">Bu sözleşmeyi zaten onayladınız, karşı tarafın onayı bekleniyor.</p>
+        {% else %}
+            <form method="post" action="{% url 'contracts:contract_approve' conversation.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success w-100">Sözleşme Şartlarını Onaylıyorum</button>
+            </form>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-success mt-4 no-print">
+        ✓ Bu sözleşme her iki taraf tarafından da onaylanmıştır ({{ contract.approved_at|date:"d.m.Y H:i" }}).
+    </div>
+    {% endif %}
+
+    <div class="mt-3 no-print">
+        <a href="{% url 'chat:conversation_detail' conversation.pk %}" class="btn btn-outline-secondary btn-sm">← Sohbete Dön</a>
+    </div>
+</div>
+{% endblock %}

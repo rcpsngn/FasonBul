@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Sohbet | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 800px;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <h4 class="fw-bold mb-1">
+                {{ other_user.profile.company_name|default:other_user.username }}
+            </h4>
+            <span class="text-muted small">İlan: <a href="{% url 'fason_advert:detail' conversation.proposal.advert.slug %}">{{ conversation.proposal.advert.title }}</a></span>
+        </div>
+        <a href="{% url 'chat:inbox' %}" class="btn btn-outline-secondary btn-sm">Mesajlarıma Dön</a>
+    </div>
+
+    <!-- FASON SÖZLEŞMESİ -->
+    <div class="card border-0 shadow-sm p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <span class="small text-muted">
+                {% if conversation.contract %}
+                    {% if conversation.contract.is_fully_approved %}
+                        <span class="badge bg-success me-1">✓ Onaylandı</span> Fason sözleşmesi her iki tarafça onaylandı.
+                    {% else %}
+                        <span class="badge bg-warning text-dark me-1">Onay Bekliyor</span> Bir sözleşme oluşturulmuş, onay bekleniyor.
+                    {% endif %}
+                {% else %}
+                    Henüz bir fason sözleşmesi oluşturulmadı.
+                {% endif %}
+            </span>
+            <a href="{% url 'contracts:contract_detail' conversation.pk %}" class="btn btn-outline-primary btn-sm">📄 Fason Sözleşmesi</a>
+        </div>
+    </div>
+
+    <!-- YÜZ YÜZE GÖRÜŞME ONAYI -->
+    <div class="card border-0 shadow-sm p-3 mb-4">
+        {% if conversation.is_meeting_confirmed %}
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success">✓ Yüz Yüze Görüşüldü</span>
+                <span class="text-muted small">{{ conversation.meeting_confirmed_at|date:"d M Y" }} tarihinde her iki taraf da onayladı.</span>
+            </div>
+        {% else %}
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div class="small text-muted">
+                    Yerinde/yüz yüze görüştüyseniz onaylayın — iki taraf da onaylayınca bu bir güven rozeti olarak görünür.
+                    <br>
+                    Siz: {% if request.user == conversation.proposal.advert.owner %}
+                            {% if conversation.owner_confirmed_meeting %}<span class="text-success fw-semibold">Onayladınız</span>{% else %}Onaylamadınız{% endif %}
+                         {% else %}
+                            {% if conversation.bidder_confirmed_meeting %}<span class="text-success fw-semibold">Onayladınız</span>{% else %}Onaylamadınız{% endif %}
+                         {% endif %}
+                    &nbsp;•&nbsp; Karşı taraf: {% if request.user == conversation.proposal.advert.owner %}
+                            {% if conversation.bidder_confirmed_meeting %}<span class="text-success fw-semibold">Onayladı</span>{% else %}Onaylamadı{% endif %}
+                         {% else %}
+                            {% if conversation.owner_confirmed_meeting %}<span class="text-success fw-semibold">Onayladı</span>{% else %}Onaylamadı{% endif %}
+                         {% endif %}
+                </div>
+                <form method="post" action="{% url 'chat:confirm_meeting' conversation.pk %}" class="mb-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline-success btn-sm">Yüz Yüze Görüştük, Onayla</button>
+                </form>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- MESAJ GEÇMİŞİ -->
+    <div class="card border-0 shadow-sm p-3 mb-3" style="max-height: 400px; overflow-y: auto;">
+        {% if thread %}
+            {% for message in thread %}
+            <div class="mb-3 {% if message.sender == request.user %}text-end{% endif %}">
+                <div class="d-inline-block p-2 rounded {% if message.sender == request.user %}bg-primary text-white{% else %}bg-light{% endif %}" style="max-width: 75%;">
+                    {{ message.content|linebreaksbr }}
+                </div>
+                <div class="small text-muted">{{ message.created_at|date:"d M H:i" }}</div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted mb-0">Henüz mesaj yok, ilk mesajı siz gönderin.</p>
+        {% endif %}
+    </div>
+
+    <!-- YENİ MESAJ -->
+    <form method="post" class="d-flex gap-2">
+        {% csrf_token %}
+        {{ form.content }}
+        <button type="submit" class="btn btn-primary">Gönder</button>
+    </form>
+</div>
+{% endblock %}

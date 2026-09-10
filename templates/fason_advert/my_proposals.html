@@ -25,10 +25,13 @@
                 {% endif %}
             </div>
             <p class="mb-2">{{ proposal.message|linebreaks }}</p>
-            <div class="d-flex gap-4 text-secondary small">
+            <div class="d-flex gap-4 text-secondary small mb-2">
                 {% if proposal.price_offer %}<span><strong>Teklif Fiyatı:</strong> {{ proposal.price_offer }} TL</span>{% endif %}
                 {% if proposal.quantity_offer %}<span><strong>Karşılanabilecek Adet:</strong> {{ proposal.quantity_offer }}</span>{% endif %}
             </div>
+            {% if proposal.status == 'ACCEPTED' %}
+            <a href="{% url 'chat:conversation_detail' proposal.conversation.pk %}" class="btn btn-primary btn-sm">💬 Sohbeti Aç</a>
+            {% endif %}
         </div>
         {% endfor %}
     {% else %}
