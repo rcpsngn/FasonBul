@@ -67,3 +67,17 @@ def contract_approve_view(request, conversation_pk):
     contract = get_object_or_404(Contract, conversation=conversation)
     contract.approve_for(request.user)
     return redirect('contracts:contract_detail', conversation_pk=conversation_pk)
+
+
+@login_required
+def contract_complete_view(request, conversation_pk):
+    if request.method != 'POST':
+        raise Http404()
+    conversation = _get_conversation_or_404(request, conversation_pk)
+    contract = get_object_or_404(Contract, conversation=conversation)
+    contract.mark_completed_for(request.user)
+    if contract.is_completed:
+        messages.success(request, 'İş tamamlandı olarak işaretlendi. Artık karşı tarafı değerlendirebilirsiniz.')
+    else:
+        messages.info(request, 'Tamamlandı beyanınız kaydedildi, karşı tarafın beyanı bekleniyor.')
+    return redirect('contracts:contract_detail', conversation_pk=conversation_pk)

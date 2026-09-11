@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AdvertCategory, Advert, Proposal
+from .models import AdvertCategory, Advert, Proposal, ProposalOffer
 
 
 @admin.register(AdvertCategory)
@@ -17,9 +17,26 @@ class AdvertAdmin(admin.ModelAdmin):
     raw_id_fields = ("owner",)
 
 
+class ProposalOfferInline(admin.TabularInline):
+    model = ProposalOffer
+    extra = 0
+    raw_id_fields = ("sender",)
+
+
 @admin.register(Proposal)
 class ProposalAdmin(admin.ModelAdmin):
-    list_display = ("advert", "bidder", "status", "price_offer", "quantity_offer", "created_at", "responded_at")
+    list_display = ("advert", "bidder", "status", "latest_price_offer", "latest_quantity_offer", "created_at", "responded_at")
     list_filter = ("status",)
     search_fields = ("advert__title", "bidder__username")
-    raw_id_fields = ("advert", "bidder")
+    raw_id_fields = ("advert", "bidder", "awaiting_response_from")
+    inlines = [ProposalOfferInline]
+
+    @admin.display(description="Birim Fiyat (TL)")
+    def latest_price_offer(self, obj):
+        offer = obj.latest_offer
+        return offer.price_offer if offer else "-"
+
+    @admin.display(description="Adet")
+    def latest_quantity_offer(self, obj):
+        offer = obj.latest_offer
+        return offer.quantity_offer if offer else "-"

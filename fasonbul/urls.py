@@ -16,6 +16,7 @@ urlpatterns = [
     path('iletisim/', include('apps.contracts.urls', namespace='contracts')),
     path('hizmetler/', include('apps.service.urls', namespace='service')),
     path('mesajlar/', include('apps.chat.urls', namespace='chat')),
+    path('degerlendirme/', include('apps.reviews.urls', namespace='reviews')),
 ]
 
 # Geliştirme (DEBUG) ortamında yüklenen resim/medya dosyalarının görüntülenebilmesi için:

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.utils import timezone
 from .models import Advert, AdvertCategory, Proposal
 from .forms import AdvertForm, ProposalForm
+from apps.reviews.utils import get_pending_reviews
 
 
 def advert_list(request):
@@ -53,6 +54,14 @@ def advert_detail(request, slug):
 
 @login_required
 def advert_create(request):
+    pending_reviews = get_pending_reviews(request.user)
+    if pending_reviews.exists():
+        messages.warning(
+            request,
+            'Yeni ilan açmadan önce tamamlanmış işleriniz için değerlendirme yapmanız gerekiyor.'
+        )
+        return redirect('contracts:contract_detail', conversation_pk=pending_reviews.first().conversation_id)
+
     if request.method == 'POST':
         form = AdvertForm(request.POST, request.FILES)
         if form.is_valid():
@@ -81,14 +90,26 @@ def proposal_create_view(request, slug):
         return redirect('fason_advert:detail', slug=slug)
 
     if request.method == 'POST':
-        form = ProposalForm(request.POST, instance=existing if existing else None)
+        form = ProposalForm(request.POST)
         if form.is_valid():
-            proposal = form.save(commit=False)
-            proposal.advert = advert
-            proposal.bidder = request.user
-            proposal.status = Proposal.Status.PENDING
-            proposal.responded_at = None
-            proposal.save()
+            if existing:
+                proposal = existing
+                proposal.status = Proposal.Status.PENDING
+                proposal.responded_at = None
+                proposal.awaiting_response_from = advert.owner
+                proposal.save()
+            else:
+                proposal = Proposal.objects.create(
+                    advert=advert,
+                    bidder=request.user,
+                    status=Proposal.Status.PENDING,
+                    awaiting_response_from=advert.owner,
+                )
+
+            offer = form.save(commit=False)
+            offer.proposal = proposal
+            offer.sender = request.user
+            offer.save()
             messages.success(request, 'Teklifiniz gönderildi.')
         else:
             messages.error(request, 'Teklif gönderilirken bir hata oluştu, lütfen tekrar deneyin.')

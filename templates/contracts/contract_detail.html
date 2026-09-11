@@ -127,6 +127,43 @@
     <div class="alert alert-success mt-4 no-print">
         ✓ Bu sözleşme her iki taraf tarafından da onaylanmıştır ({{ contract.approved_at|date:"d.m.Y H:i" }}).
     </div>
+
+    {% if not contract.is_completed %}
+    <div class="card border-0 shadow-sm p-4 mt-3 no-print">
+        <h6 class="fw-bold mb-3">İş Tamamlandı mı?</h6>
+        <div class="row mb-3">
+            <div class="col-6 text-center">
+                <p class="mb-1">İş Veren</p>
+                {% if contract.owner_completed %}
+                    <span class="badge bg-success">✓ Tamamlandı Dedi</span>
+                {% else %}
+                    <span class="badge bg-secondary">Bekleniyor</span>
+                {% endif %}
+            </div>
+            <div class="col-6 text-center">
+                <p class="mb-1">İmalatçı (Atölye)</p>
+                {% if contract.bidder_completed %}
+                    <span class="badge bg-success">✓ Tamamlandı Dedi</span>
+                {% else %}
+                    <span class="badge bg-secondary">Bekleniyor</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if request.user == contract.owner and contract.owner_completed or request.user == contract.bidder and contract.bidder_completed %}
+            <p class="text-success fw-semibold mb-0">İşi tamamlandı olarak işaretlediniz, karşı tarafın beyanı bekleniyor.</p>
+        {% else %}
+            <form method="post" action="{% url 'contracts:contract_complete' conversation.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline-success w-100">İşi Tamamladım</button>
+            </form>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="alert alert-primary mt-3 no-print">
+        ✓ İş her iki taraf tarafından da tamamlandı olarak işaretlendi ({{ contract.completed_at|date:"d.m.Y H:i" }}).
+        <a href="{% url 'reviews:review_create' contract.pk %}" class="alert-link">Karşı tarafı değerlendir →</a>
+    </div>
+    {% endif %}
     {% endif %}
 
     <div class="mt-3 no-print">

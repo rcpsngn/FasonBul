@@ -51,12 +51,54 @@ class Profile(models.Model):
     is_verified = models.BooleanField(default=False, verbose_name="Doğrulanmış (Vergi Levhalı) Rozet")
     verified_at = models.DateTimeField(blank=True, null=True, verbose_name="Doğrulama Tarihi")
 
+    # apps.reviews.Review kaydedildikçe signals.py üzerinden güncellenen önbelleklenmiş ortalamalar.
+    # Her sayfa yüklemesinde ortalama hesaplamamak için burada tutulur.
+    avg_workmanship = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name="Ort. İşçilik Kalitesi")
+    avg_timeliness = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name="Ort. Zamanında Teslimat")
+    avg_payment_discipline = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name="Ort. Ödeme Disiplini")
+    avg_defect_rate_score = models.DecimalField(max_digits=3, decimal_places=2, default=0, verbose_name="Ort. Sakat/Fire Memnuniyeti")
+    review_count = models.PositiveIntegerField(default=0, verbose_name="Değerlendirme Sayısı")
+
     class Meta:
         verbose_name = "Profil"
         verbose_name_plural = "Profiller"
 
     def __str__(self):
         return self.company_name or self.user.username
+
+    def refresh_review_aggregates(self):
+        """apps.reviews.Review'ler üzerinden 4 kriterin ortalamasını yeniden hesaplar.
+        Review kaydedildiğinde/silindiğinde apps/reviews/signals.py tarafından çağrılır."""
+        from django.db.models import Avg
+        aggregates = self.user.reviews_received.aggregate(
+            workmanship=Avg('workmanship_score'),
+            timeliness=Avg('timeliness_score'),
+            payment=Avg('payment_discipline_score'),
+            defect_rate=Avg('defect_rate_score'),
+        )
+        self.review_count = self.user.reviews_received.count()
+        self.avg_workmanship = aggregates['workmanship'] or 0
+        self.avg_timeliness = aggregates['timeliness'] or 0
+        self.avg_payment_discipline = aggregates['payment'] or 0
+        self.avg_defect_rate_score = aggregates['defect_rate'] or 0
+        self.save(update_fields=[
+            'avg_workmanship', 'avg_timeliness', 'avg_payment_discipline',
+            'avg_defect_rate_score', 'review_count',
+        ])
+
+    @property
+    def reputation_badges(self):
+        """Yeterli değerlendirme birikince kazanılan itibar etiketleri.
+        Eşik: en az 3 değerlendirme + ilgili kriterde 4.5/5 ve üzeri ortalama."""
+        badges = []
+        if self.review_count >= 3:
+            if self.avg_defect_rate_score >= 4.5:
+                badges.append('Düşük Fireli Üretici')
+            if self.avg_payment_discipline >= 4.5:
+                badges.append('Zamanında Ödeyen Firma')
+            if self.avg_timeliness >= 4.5:
+                badges.append('Zamanında Teslim Eden')
+        return badges
 
     def refresh_verification_status(self):
         """En az bir Vergi Levhası belgesi varsa rozeti otomatik açar, yoksa kapatır.

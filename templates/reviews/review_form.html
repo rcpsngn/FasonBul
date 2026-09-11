@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block title %}Değerlendirme Yap | FasonBul{% endblock %}
+
+{% block content %}
+<div class="container my-5" style="max-width: 600px;">
+    <div class="card border-0 shadow-sm p-4">
+        <h4 class="fw-bold mb-1">Değerlendirme Yap</h4>
+        <p class="text-muted mb-4">
+            {{ reviewee.profile.company_name|default:reviewee.get_full_name|default:reviewee.username }}
+            ile yaptığınız iş için 4 kriterde puan verin.
+        </p>
+
+        <form method="post">
+            {% csrf_token %}
+
+            {% for field in form.visible_fields %}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">{{ field.label }}</label>
+                    {% if field.name == 'comment' %}
+                        {{ field }}
+                    {% else %}
+                        <div class="d-flex gap-3">
+                            {% for radio in field %}
+                                <label class="form-check-label">
+                                    {{ radio.tag }} {{ radio.choice_label }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                    {% if field.errors %}
+                        <div class="text-danger small">{{ field.errors }}</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+            <button type="submit" class="btn btn-success w-100">Değerlendirmeyi Gönder</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

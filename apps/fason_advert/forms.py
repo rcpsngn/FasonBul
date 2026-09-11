@@ -1,5 +1,5 @@
 from django import forms
-from .models import Advert, Proposal
+from .models import Advert, Proposal, ProposalOffer
 
 
 class AdvertForm(forms.ModelForm):
@@ -21,7 +21,7 @@ class AdvertForm(forms.ModelForm):
 
 class ProposalForm(forms.ModelForm):
     class Meta:
-        model = Proposal
+        model = ProposalOffer
         fields = ['message', 'price_offer', 'quantity_offer']
         widgets = {
             'message': forms.Textarea(attrs={'class': 'form-control', 'rows': 4, 'placeholder': 'Teklifinizi ve varsa şartlarınızı yazın...'}),

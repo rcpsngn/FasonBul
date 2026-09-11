@@ -60,25 +60,29 @@ class Advert(models.Model):
 
 
 class Proposal(models.Model):
-    """Bir atölyenin (ya da firmanın) bir ilana verdiği teklif.
-    unique_together sayesinde aynı kullanıcı aynı ilana birden fazla AKTİF teklif
-    gönderemez; reddedilen bir teklif üzerine tekrar teklif verilebilir (aynı kayıt güncellenir)."""
+    """Bir ilan üzerindeki tüm pazarlık sürecinin başlığı (thread).
+    Asıl fiyat/adet/mesaj geçmişi artık ProposalOffer'da tutuluyor."""
 
     objects = None
 
     class Status(models.TextChoices):
-        PENDING = 'PENDING', 'Bekliyor'
+        PENDING = 'PENDING', 'Görüşülüyor'
         ACCEPTED = 'ACCEPTED', 'Kabul Edildi'
         REJECTED = 'REJECTED', 'Reddedildi'
+        WITHDRAWN = 'WITHDRAWN', 'Geri Çekildi'
 
     advert = models.ForeignKey(Advert, on_delete=models.CASCADE, related_name='proposals', verbose_name="İlan")
-    bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_proposals', verbose_name="Teklif Veren")
-    message = models.TextField(verbose_name="Teklif Mesajı")
-    price_offer = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Teklif Edilen Birim Fiyat (TL)")
-    quantity_offer = models.PositiveIntegerField(blank=True, null=True, verbose_name="Karşılanabilecek Adet")
+    bidder = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_proposals', verbose_name="Teklif Veren (Atölye)")
     status = models.CharField(max_length=10, choices=Status.choices, default=Status.PENDING, verbose_name="Durum")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Gönderilme Tarihi")
-    responded_at = models.DateTimeField(blank=True, null=True, verbose_name="Yanıt Tarihi")
+
+    # Sırada kimin teklif/yanıt vermesi bekleniyor - pazarlığın kimde olduğunu gösterir.
+    awaiting_response_from = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='+',
+        verbose_name="Sırası Kimde"
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Başlama Tarihi")
+    responded_at = models.DateTimeField(blank=True, null=True, verbose_name="Sonuçlanma Tarihi")
 
     class Meta:
         verbose_name = "Teklif"
@@ -86,5 +90,30 @@ class Proposal(models.Model):
         unique_together = ('advert', 'bidder')
         ordering = ['-created_at']
 
+    @property
+    def latest_offer(self):
+        return self.offers.first()  # ProposalOffer Meta.ordering = ['-created_at']
+
     def __str__(self):
         return f"{self.bidder} -> {self.advert} ({self.get_status_display()})"
+
+
+class ProposalOffer(models.Model):
+    """Pazarlıktaki her bir tur: bir tarafın attığı fiyat/adet/mesaj.
+    İlk teklif atölyeden gelir (sender=bidder); firma isterse aynı Proposal
+    üzerinde yeni bir ProposalOffer açarak karşı teklif verir (sender=owner), vs."""
+
+    proposal = models.ForeignKey(Proposal, on_delete=models.CASCADE, related_name='offers', verbose_name="Teklif")
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='proposal_offers', verbose_name="Gönderen")
+    price_offer = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True, verbose_name="Teklif Edilen Birim Fiyat (TL)")
+    quantity_offer = models.PositiveIntegerField(blank=True, null=True, verbose_name="Karşılanabilecek Adet")
+    message = models.TextField(verbose_name="Mesaj")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Gönderilme Tarihi")
+
+    class Meta:
+        verbose_name = "Teklif Turu"
+        verbose_name_plural = "Teklif Turları"
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.sender} - {self.price_offer} TL ({self.proposal_id})"

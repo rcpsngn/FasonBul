@@ -24,6 +24,12 @@ class Contract(models.Model):
     bidder_approved = models.BooleanField(default=False, verbose_name="Teklif Verenin Onayı")
     approved_at = models.DateTimeField(blank=True, null=True, verbose_name="Tam Onay Tarihi")
 
+    # İş bitince her iki taraf da ayrıca "iş tamamlandı" beyan eder; değerlendirme (reviews)
+    # ancak bu ikisi de True olduktan sonra açılır.
+    owner_completed = models.BooleanField(default=False, verbose_name="İlan Sahibi İş Tamamlandı Beyanı")
+    bidder_completed = models.BooleanField(default=False, verbose_name="Teklif Verenin İş Tamamlandı Beyanı")
+    completed_at = models.DateTimeField(blank=True, null=True, verbose_name="Tam Tamamlanma Tarihi")
+
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Oluşturulma Tarihi")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Güncellenme Tarihi")
 
@@ -69,3 +75,27 @@ class Contract(models.Model):
                 self.approved_at = timezone.now()
             self.save()
         return self.is_fully_approved
+
+    @property
+    def is_completed(self):
+        return self.owner_completed and self.bidder_completed
+
+    def mark_completed_for(self, user):
+        """Bir tarafın 'iş tamamlandı' beyanını kaydeder. Sözleşme henüz tam onaylanmadıysa
+        (is_fully_approved değilse) tamamlama beyanı kabul edilmez."""
+        if not self.is_fully_approved:
+            return self.is_completed
+
+        changed = False
+        if user == self.owner and not self.owner_completed:
+            self.owner_completed = True
+            changed = True
+        elif user == self.bidder and not self.bidder_completed:
+            self.bidder_completed = True
+            changed = True
+
+        if changed:
+            if self.owner_completed and self.bidder_completed and not self.completed_at:
+                self.completed_at = timezone.now()
+            self.save()
+        return self.is_completed
